@@ -24,7 +24,7 @@ def GetUniqueAddressesFromCsvFile(csvFilePath):
     addresses.sort()
     return addresses
     
-def PrintSfrEligibilityRowHandler(csvFilePath, debug):
+def PrintSfrEligibility(csvFilePath, debug):
     session = requests.Session()
     with open(csvFilePath, encoding='utf-8') as csvFile:
         reader = csv.DictReader(csvFile)        
