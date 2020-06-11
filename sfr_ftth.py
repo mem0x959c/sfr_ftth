@@ -9,6 +9,8 @@ def NormalizePostalAddress(postalAddress):
             c = 'e'
         elif c == 'à':
             c = 'a'
+        elif c in '\t\r\n\f':
+            c = ''
         a += c.upper()
     return a
 
