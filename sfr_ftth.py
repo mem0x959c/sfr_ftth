@@ -76,3 +76,9 @@ def GetEligibilityByPostalAddress(postalAddress, session = None, debug = False):
     if idRa is None:
         return (-1, 'Addresse inconnue')
     return GetEligibilityByIdRa(idRa, session, debug)
+
+def GetEligibilityByPostalAddress2(postalAddress, session = None, debug = False):
+    try:
+        return GetEligibilityByPostalAddress(postalAddress, session, debug)
+    except:
+        return (-1, 'Erreur pour l\'addresse: {}'.format(postalAddress))
