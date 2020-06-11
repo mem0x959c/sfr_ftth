@@ -67,3 +67,8 @@ d'afficher les addresses qui sont déclarées éligibles sur le site SFR mais no
 ```
 python test_sfr_ftth2.py mv_immeubles_2020t1_bj.csv
 ```
+
+## Avertissement
+
+Ces fichiers sont fournis uniquement à des fins de recherche. Je ne suis pas affilié a SFR. 
+Je ne pourrais être tenue responsable d’un dommage consécutif, directe ou indirecte, découlant de l'utilisation de ces fichiers.
