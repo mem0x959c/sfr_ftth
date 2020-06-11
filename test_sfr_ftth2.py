@@ -49,11 +49,10 @@ def CompareArcepSfrEligibility(csvFilePath, debug):
 
 if __name__ == "__main__":    
     debug = False
-    csvFilePath = ''
     if len(sys.argv) >= 2:
         csvFilePath = sys.argv[1]
         #PrintSfrEligibility(csvFilePath, debug)
         CompareArcepSfrEligibility(csvFilePath, debug)
     else:
-        print('Usage: {} <csv_file_path>', sys.argv[0])
+        print('Usage: {} <csv_file_path>'.format(sys.argv[0]))
         sys.exit(1)
