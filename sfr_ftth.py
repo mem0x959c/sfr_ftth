@@ -2,20 +2,37 @@ import requests, json
 
 def NormalizePostalAddress(postalAddress):
     a = ''
-    for c in postalAddress.replace("''", "'"):
+    for c in postalAddress.upper().replace("''", "'").replace('  ', ' '):
         if c in '-\'':
             c = ' '
-        elif c in 'éèê':
-            c = 'e'
-        elif c == 'à':
-            c = 'a'
+        elif c in 'ÀÂÆ':
+            c = 'A'
+        elif c == 'Ç':
+            c = 'C'
+        elif c in 'ÉÈÊË':
+            c = 'E'
+        elif c in 'ÎÏ':
+            c = 'I'
+        elif c in 'ÔŒ':
+            c = 'O'
+        elif c in 'ÙÛÜ':
+            c = 'U'
         elif c in '\t\r\n\f':
             c = ''
-        a += c.upper()
+        a += c
     return a
 
 def AreSimilarPostalAddresses(a1, a2):
-    return NormalizePostalAddress(a1) == NormalizePostalAddress(a2)
+    A1 = NormalizePostalAddress(a1)
+    A2 = NormalizePostalAddress(a2)
+    if A1 == A2:
+        return True
+    for pr in [(' AV ' ,' AVENUE '), (' BD ', ' BOULEVARD '), (' IMP ', ' IMPASSE '), (' RTE ', ' ROUTE '), (' ST ', ' SAINT ')]:
+        A1 = A1.replace(pr[0], pr[1])
+        A2 = A2.replace(pr[0], pr[1])
+        if A1 == A2:
+            return True
+    return False
 
 def GetIdRa(postalAddress, session, debug = False):
     address = NormalizePostalAddress(postalAddress)
@@ -76,11 +93,15 @@ def GetEligibilityByIdRa(idRa, session, debug = False):
 def GetEligibilityByPostalAddress(postalAddress, session = None, debug = False):
     idRa = GetIdRa(postalAddress, session, debug)
     if idRa is None:
-        return (-1, 'Addresse inconnue')
-    return GetEligibilityByIdRa(idRa, session, debug)
+        return (-1, 'Addresse inconnue: {}'.format(postalAddress))
+    res = GetEligibilityByIdRa(idRa, session, debug)
+    if res is None:
+        return (-1, 'Erreur pour l\'adresse: {}, IdRa {}'.format(postalAddress, idRa))
+    return res
 
-def GetEligibilityByPostalAddress2(postalAddress, session = None, debug = False):
+def GetEligibilityByPostalAddress2(args):
     try:
+        (postalAddress, session, debug) = args
         return GetEligibilityByPostalAddress(postalAddress, session, debug)
     except:
         return (-1, 'Erreur pour l\'addresse: {}'.format(postalAddress))
