@@ -26,26 +26,25 @@ def GetUniqueAddressesFromCsvFile(csvFilePath):
     
 def PrintSfrEligibility(csvFilePath, debug):
     session = requests.Session()
-    with open(csvFilePath, encoding='utf-8') as csvFile:
-        reader = csv.DictReader(csvFile)        
-        next(reader)
-        for row in reader:
-            address = MakeAddressFromCsvRow(row)
-            (statusCode, statusText) = sfr_ftth.GetEligibilityByPostalAddress(address, session, debug)
-            #if 'status inconnu' in statusText:
-                #    print('{}, {} ({})'.format(address, statusText, statusCode))
-            print('{}, {} ({})'.format(address, statusText, statusCode))
-    
+    addresses = GetUniqueAddressesFromCsvFile(csvFilePath)
+    with multiprocessing.Pool(processes=20) as pool:
+        results = pool.imap(sfr_ftth.GetEligibilityByPostalAddress2, [(a, session, debug) for a in addresses])
+        for r, a in zip(results, addresses):
+            if r[0] < 0:
+                print(r[1])
+            else:
+                print('{} {}'.format(a, r))
+
 def CompareArcepSfrEligibility(csvFilePath, debug):
     addresses = GetUniqueAddressesFromCsvFile(csvFilePath)
     session = requests.Session()
-    with multiprocessing.Pool(processes=16) as pool:
+    with multiprocessing.Pool(processes=20) as pool:
         results = pool.imap(sfr_ftth.GetEligibilityByPostalAddress2, [(a, session, debug) for a in addresses])
         for r, a in zip(results, addresses):
-            if r[0] == 1:
-                print(a)
-            elif r[0] == -1:
+            if r[0] < 0:
                 print(r[1])
+            elif r[0] == 1:
+                print(a)
 
 if __name__ == "__main__":
     debug = False

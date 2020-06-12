@@ -96,12 +96,15 @@ def GetEligibilityByPostalAddress(postalAddress, session = None, debug = False):
         return (-1, 'Addresse inconnue: {}'.format(postalAddress))
     res = GetEligibilityByIdRa(idRa, session, debug)
     if res is None:
-        return (-1, 'Erreur pour l\'adresse: {}, IdRa {}'.format(postalAddress, idRa))
+        return (-2, 'Erreur pour l\'adresse: {}, IdRa {}'.format(postalAddress, idRa))
     return res
 
 def GetEligibilityByPostalAddress2(args):
     try:
         (postalAddress, session, debug) = args
-        return GetEligibilityByPostalAddress(postalAddress, session, debug)
+        res = GetEligibilityByPostalAddress(postalAddress, session, debug)
+        if res[0] == -2:
+            res = GetEligibilityByPostalAddress(postalAddress, session, debug) # try again I've noticed there are spurious failure
+        return res
     except:
-        return (-1, 'Erreur pour l\'addresse: {}'.format(postalAddress))
+        return (-3, 'Erreur pour l\'addresse: {}'.format(postalAddress))

@@ -11,13 +11,13 @@ def GetUniqueAddressesFromTxtFile(txtFilePath):
 def PrintSfrEligibilityFromTxtFile(txtFilePath, debug):
     addresses = GetUniqueAddressesFromTxtFile(txtFilePath)
     session = requests.Session()
-    with multiprocessing.Pool(processes=16) as pool:
+    with multiprocessing.Pool(processes=20) as pool:
         results = pool.imap(sfr_ftth.GetEligibilityByPostalAddress2, [(a, session, debug) for a in addresses])
         for r, a in zip(results, addresses):
-            if r[0] == -1:
+            if r[0] < 0:
                 print(r[1])
             else:
-                print('{}, {}'.format(a, r[1]))
+                print('{} {}'.format(a, r))
 
 if __name__ == "__main__":
     debug = False
