@@ -22,16 +22,31 @@ def NormalizePostalAddress(postalAddress):
         a += c
     return a
 
+def GetStringsWordDifference(a, b):
+    if len(a[0]) > len(b[0]):
+        return [x for x in a.split() if x not in b.split()]
+    else:
+        return [x for x in b.split() if x not in a.split()]
+
 def AreSimilarPostalAddresses(a1, a2):
     A1 = NormalizePostalAddress(a1)
     A2 = NormalizePostalAddress(a2)
     if A1 == A2:
         return True
+    
     for pr in [(' AV ' ,' AVENUE '), (' BD ', ' BOULEVARD '), (' IMP ', ' IMPASSE '), (' RTE ', ' ROUTE '), (' ST ', ' SAINT ')]:
         A1 = A1.replace(pr[0], pr[1])
         A2 = A2.replace(pr[0], pr[1])
         if A1 == A2:
             return True
+    
+    token1 = A1.split(',')
+    token2 = A2.split(',')
+    if len(token1) == 2 and len(token1) == len(token2) and token1[1] == token2[1]:
+        strDiffs = GetStringsWordDifference(token1[0], token2[0])
+        for str in strDiffs:
+            if str in ['DE']:
+                return True
     return False
 
 def GetIdRa(postalAddress, session, debug = False):
