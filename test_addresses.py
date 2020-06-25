@@ -13,7 +13,8 @@ def TestNormalizePostalAddress():
     ('27 rue du belvédère, 38300 Bourgoin-Jallieu', '27 RUE DU BELVEDERE, 38300 BOURGOIN JALLIEU'),
     ('1 rue du martin pêcheur, 38300 bourgoin jallieu', '1 RUE DU MARTIN PECHEUR, 38300 BOURGOIN JALLIEU'),
     ('1 rue camille saint-saëns, 38300 bourgoin jallieu', '1 RUE CAMILLE SAINT SAENS, 38300 BOURGOIN JALLIEU'),
-    ('2 avenue du médipôle, 38300 bourgoin jallieu', '2 AVENUE DU MEDIPOLE, 38300 BOURGOIN JALLIEU')
+    ('2 avenue du médipôle, 38300 bourgoin jallieu', '2 AVENUE DU MEDIPOLE, 38300 BOURGOIN JALLIEU'),
+    ('7 allée des sétives, 38300 bourgoin jallieu', '7 ALLEE DES SETIVES, 38300 BOURGOIN JALLIEU')
     ]
     
     print()
@@ -29,7 +30,8 @@ def TestAreSimilarPostalAddresses():
     ('1 rue du martin pêcheur, 38300 bourgoin jallieu', '1 RUE DU MARTIN PECHEUR, 38300 BOURGOIN JALLIEU'),
     ('1 rue camille saint-saëns, 38300 bourgoin jallieu', '1 RUE CAMILLE SAINT SAENS, 38300 BOURGOIN JALLIEU'),
     ('2 avenue du médipôle, 38300 bourgoin jallieu', '2 AVENUE DU MEDIPOLE, 38300 BOURGOIN JALLIEU'),
-    ('1 rte st marcel bel accueil, 38300 bourgoin jallieu', '1 RTE DE SAINT MARCEL BEL ACCUEIL, 38300 BOURGOIN JALLIEU')
+    ('1 rte st marcel bel accueil, 38300 bourgoin jallieu', '1 RTE DE SAINT MARCEL BEL ACCUEIL, 38300 BOURGOIN JALLIEU'),
+    ('7 allée des sétives, 38300 bourgoin jallieu', '7 ALLEE DES SETIVES, 38300 BOURGOIN JALLIEU')
     ]
     
     print()

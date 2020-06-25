@@ -6,7 +6,17 @@ def MakeAddressFromCsvRow(row):
     address = '{} {} {}, {} {}'.format(row['num_voie'], row['type_voie'], row['nom_voie'], row['code_poste'], row['nom_com'])
     return sfr_ftth.NormalizePostalAddress(address)
 
-def GetUniqueAddressesFromCsvFile(csvFilePath):
+def GetAddressesFromCsvFile(csvFilePath):
+    addresses = set()
+    with open(csvFilePath, encoding='utf-8') as csvFile:
+        reader = csv.DictReader(csvFile)        
+        next(reader)
+        for row in reader:
+            address = MakeAddressFromCsvRow(row)
+            addresses.add(address)
+    return sorted(addresses)
+
+def GetNonDeployedAddressesFromCsvFile(csvFilePath):
     addressToDeployed = {}
     with open(csvFilePath, encoding='utf-8') as csvFile:
         reader = csv.DictReader(csvFile)        
@@ -25,33 +35,32 @@ def GetUniqueAddressesFromCsvFile(csvFilePath):
     return addresses
     
 def PrintSfrEligibility(csvFilePath, debug):
+    addresses = GetAddressesFromCsvFile(csvFilePath)
+    #addresses = GetNonDeployedAddressesFromCsvFile(csvFilePath)
     session = requests.Session()
-    addresses = GetUniqueAddressesFromCsvFile(csvFilePath)
-    with multiprocessing.Pool(processes=20) as pool:
+    with multiprocessing.Pool(processes=50) as pool:
         results = pool.imap(sfr_ftth.GetEligibilityByPostalAddress2, [(a, session, debug) for a in addresses])
+        
+        numEligible = 0
+        num666 = 0
+        numWip = 0
         for r, a in zip(results, addresses):
-            if r[0] < 0:
-                print(r[1])
-            else:
-                print('{} {}'.format(a, r))
-
-def CompareArcepSfrEligibility(csvFilePath, debug):
-    addresses = GetUniqueAddressesFromCsvFile(csvFilePath)
-    session = requests.Session()
-    with multiprocessing.Pool(processes=20) as pool:
-        results = pool.imap(sfr_ftth.GetEligibilityByPostalAddress2, [(a, session, debug) for a in addresses])
-        for r, a in zip(results, addresses):
-            if r[0] < 0:
-                print(r[1])
-            elif r[0] == 1:
-                print(a)
+            print('{}, code {}, eligible {}, workInProgress {}'.format(a, r[0], r[1], r[2]))
+            if r[1] == True: numEligible += 1
+            if r[0] == 666: num666 += 1
+            if r[2] == True: numWip += 1
+        
+        numAddresses = len(addresses)
+        print("Number of eligible addresses {} / {} ({:.2f}%)".format(numEligible, numAddresses, numEligible/numAddresses*100))
+        print("Number of workInProgress==True {} / {} ({:.2f}%)".format(numWip, numAddresses, numWip/numAddresses*100))
+        print("Number of code 666 {} / {} ({:.2f}%)".format(num666, numAddresses, num666/numAddresses*100))
 
 if __name__ == "__main__":
     debug = False
     if len(sys.argv) >= 2:
         csvFilePath = sys.argv[1]
-        #PrintSfrEligibility(csvFilePath, debug)
-        CompareArcepSfrEligibility(csvFilePath, debug)
+        PrintSfrEligibility(csvFilePath, debug)
+        #CompareArcepSfrEligibility(csvFilePath, debug)
     else:
         print('Usage: {} <csv_file_path>'.format(sys.argv[0]))
         sys.exit(1)

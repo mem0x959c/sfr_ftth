@@ -70,18 +70,20 @@ def GetIdRa(postalAddress, session, debug = False):
     return ids[0]
     
 def EligibilityStatusToString(status):
-    if status == 1:
+    if status == 1 or status == 3304:
         return 'VOUS ÊTES ÉLIGIBLE AUX OFFRES FIBRE DE SFR'
     elif status == 1101 or status == 3101:
         return 'La fibre de SFR est en cours de déploiement dans votre ville'
-    elif status == 1102:
+    elif status == 1102 or status == 3102 or status == 3103:
         return 'La fibre de SFR est en cours de déploiement dans votre quartier'
     elif status == 0:
         return 'La fibre de SFR est en cours de déploiement dans votre rue'
     elif status == 666:
         return 'Une difficulté a été rencontrée sur le raccordement fibre de votre adresse'
-    elif status == 3402:
+    elif status == 3302 or status == 3401 or status == 3402:
         return 'Les équipes SFR réalisent actuellement les travaux de raccordement de votre quartier à la fibre'
+    elif status == 100:
+        return 'Votre adresse est temporairement inéligible à la fibre'
     elif status in [2, 1401, 2101, 2102, 3403]:
         return 'VOUS ÊTES ÉLIGIBLE AUX OFFRES TRÈS HAUT DÉBIT (cable) DE SFR'.format(status)
     else:        
@@ -102,16 +104,18 @@ def GetEligibilityByIdRa(idRa, session, debug = False):
     if debug: print(json.dumps(resp['data'], indent=4))    
     thdLine = resp['data']['eligibilityLookup']['installationAddresses'][0]['installationTHD']['thdLine']
     if debug: print(thdLine)
-    status = thdLine['horizontalEligibilityStatus']    
-    return (status, EligibilityStatusToString(status))
+    status = thdLine['horizontalEligibilityStatus']
+    eligible = thdLine['horizontalEligibility']
+    workInProgress = thdLine['workInProgress']
+    return (status, eligible, workInProgress)
 
 def GetEligibilityByPostalAddress(postalAddress, session = None, debug = False):
     idRa = GetIdRa(postalAddress, session, debug)
     if idRa is None:
-        return (-1, 'Addresse inconnue: {}'.format(postalAddress))
+        return (-1, False, False)
     res = GetEligibilityByIdRa(idRa, session, debug)
     if res is None:
-        return (-2, 'Erreur pour l\'adresse: {}, IdRa {}'.format(postalAddress, idRa))
+        return (-2, False, False)
     return res
 
 def GetEligibilityByPostalAddress2(args):
@@ -119,7 +123,7 @@ def GetEligibilityByPostalAddress2(args):
         (postalAddress, session, debug) = args
         res = GetEligibilityByPostalAddress(postalAddress, session, debug)
         if res[0] == -2:
-            res = GetEligibilityByPostalAddress(postalAddress, session, debug) # try again I've noticed there are spurious failure
+            res = GetEligibilityByPostalAddress(postalAddress, session, debug) # try again I've noticed there are spurious failures
         return res
     except:
-        return (-3, 'Erreur pour l\'addresse: {}'.format(postalAddress))
+        return (-3, False, False)
